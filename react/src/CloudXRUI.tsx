@@ -11,7 +11,10 @@
  * Modified for BlendedXR:
  * - Move Mode button
  * - Scale Mode button
+ * - Rotate Mode button
  * - Reset Stage button
+ * - Play / Pause button
+ * - Stop button
  * - Disconnect button
  * - Shows current tool mode
  */
@@ -32,12 +35,15 @@ const FACE_CAMERA_DAMPING = 10;
 const METRIC_SLOT_WIDTH = 512;
 const METRIC_SLOT_HEIGHT = 250;
 
-export type ToolMode = 'view' | 'moveStage' | 'scaleStage';
+export type ToolMode = 'view' | 'moveStage' | 'scaleStage' | 'rotateStage';
 
 interface CloudXRUIProps {
   onMoveMode?: () => void;
   onScaleMode?: () => void;
+  onRotateMode?: () => void;
   onResetStage?: () => void;
+  onToggleTimeline?: () => void;
+  onStopTimeline?: () => void;
   onDisconnect?: () => void;
   toolMode?: ToolMode;
   serverAddress?: string;
@@ -65,6 +71,8 @@ function getToolModeLabel(toolMode: ToolMode): string {
       return 'Move Mode';
     case 'scaleStage':
       return 'Scale Mode';
+    case 'rotateStage':
+      return 'Rotate Mode';
     case 'view':
     default:
       return 'View Mode';
@@ -74,7 +82,10 @@ function getToolModeLabel(toolMode: ToolMode): string {
 export default function CloudXR3DUI({
   onMoveMode,
   onScaleMode,
+  onRotateMode,
   onResetStage,
+  onToggleTimeline,
+  onStopTimeline,
   onDisconnect,
   toolMode = 'view',
   serverAddress = '127.0.0.1',
@@ -121,6 +132,7 @@ export default function CloudXR3DUI({
 
   const moveModeActive = toolMode === 'moveStage';
   const scaleModeActive = toolMode === 'scaleStage';
+  const rotateModeActive = toolMode === 'rotateStage';
 
   return (
     <HandleTarget>
@@ -174,7 +186,7 @@ export default function CloudXR3DUI({
         >
           <Container
             width={1900}
-            height={980}
+            height={1040}
             backgroundColor="rgba(40, 40, 40, 0.85)"
             borderRadius={20}
             padding={50}
@@ -234,45 +246,45 @@ export default function CloudXR3DUI({
             <Container
               flexGrow={1}
               flexDirection="column"
-              gap={20}
+              gap={18}
               alignItems="center"
               justifyContent="center"
             >
-              <Text fontSize={96} fontWeight="bold" color="white" textAlign="center">
+              <Text fontSize={92} fontWeight="bold" color="white" textAlign="center">
                 Controls
               </Text>
 
-              <Text fontSize={44} color="white" textAlign="center" marginBottom={8}>
+              <Text fontSize={42} color="white" textAlign="center" marginBottom={4}>
                 Tool: {getToolModeLabel(toolMode)}
               </Text>
 
-              <Text fontSize={42} color="white" textAlign="center" marginBottom={8}>
+              <Text fontSize={38} color="white" textAlign="center" marginBottom={4}>
                 Server address: {serverAddress}
               </Text>
 
-              <Text fontSize={42} color="white" textAlign="center" marginBottom={32}>
+              <Text fontSize={38} color="white" textAlign="center" marginBottom={24}>
                 Session status: {sessionStatus}
               </Text>
 
-              <Text fontSize={34} color="rgba(255,255,255,0.85)" textAlign="center" marginBottom={24}>
+              <Text fontSize={32} color="rgba(255,255,255,0.85)" textAlign="center" marginBottom={18}>
                 Select a mode, then hold the right trigger to manipulate the stage.
               </Text>
 
               <Container
                 flexDirection="column"
-                gap={48}
+                gap={36}
                 alignItems="center"
                 justifyContent="center"
                 width="100%"
               >
                 {/* Mode Buttons */}
-                <Container flexDirection="row" gap={60} justifyContent="center">
+                <Container flexDirection="row" gap={36} justifyContent="center">
                   <Button
                     {...xrButton('moveMode', onMoveMode)}
                     variant="default"
-                    width={480}
-                    height={120}
-                    borderRadius={40}
+                    width={340}
+                    height={112}
+                    borderRadius={36}
                     backgroundColor={
                       moveModeActive
                         ? 'rgba(100, 150, 255, 1)'
@@ -284,17 +296,17 @@ export default function CloudXR3DUI({
                       borderWidth: 2,
                     }}
                   >
-                    <Text fontSize={48} color="black" fontWeight="medium">
-                      Move Mode
+                    <Text fontSize={42} color="black" fontWeight="medium">
+                      Move
                     </Text>
                   </Button>
 
                   <Button
                     {...xrButton('scaleMode', onScaleMode)}
                     variant="default"
-                    width={480}
-                    height={120}
-                    borderRadius={40}
+                    width={340}
+                    height={112}
+                    borderRadius={36}
                     backgroundColor={
                       scaleModeActive
                         ? 'rgba(100, 255, 150, 1)'
@@ -306,8 +318,69 @@ export default function CloudXR3DUI({
                       borderWidth: 2,
                     }}
                   >
-                    <Text fontSize={48} color="black" fontWeight="medium">
-                      Scale Mode
+                    <Text fontSize={42} color="black" fontWeight="medium">
+                      Scale
+                    </Text>
+                  </Button>
+
+                  <Button
+                    {...xrButton('rotateMode', onRotateMode)}
+                    variant="default"
+                    width={340}
+                    height={112}
+                    borderRadius={36}
+                    backgroundColor={
+                      rotateModeActive
+                        ? 'rgba(255, 180, 100, 1)'
+                        : 'rgba(220, 220, 220, 0.9)'
+                    }
+                    hover={{
+                      backgroundColor: 'rgba(255, 180, 100, 1)',
+                      borderColor: 'white',
+                      borderWidth: 2,
+                    }}
+                  >
+                    <Text fontSize={42} color="black" fontWeight="medium">
+                      Rotate
+                    </Text>
+                  </Button>
+                </Container>
+
+                {/* Timeline Buttons */}
+                <Container flexDirection="row" gap={40} justifyContent="center">
+                  <Button
+                    {...xrButton('toggleTimeline', onToggleTimeline)}
+                    variant="default"
+                    width={330}
+                    height={105}
+                    borderRadius={35}
+                    backgroundColor="rgba(150, 220, 255, 0.9)"
+                    hover={{
+                      backgroundColor: 'rgba(80, 190, 255, 1)',
+                      borderColor: 'white',
+                      borderWidth: 2,
+                    }}
+                  >
+                    <Text fontSize={38} color="black" fontWeight="medium">
+                      Play / Pause
+                    </Text>
+                  </Button>
+
+                  <Button
+                    {...xrButton('stopTimeline', onStopTimeline)}
+                    variant="default"
+                    width={330}
+                    height={105}
+                    borderRadius={35}
+                    backgroundColor="rgba(220, 220, 220, 0.9)"
+                    hover={{
+                      backgroundColor: 'rgba(180, 180, 180, 1)',
+                      borderColor: 'white',
+                      borderWidth: 2,
+                    }}
+                  >
+                    <Text fontSize={40} color="black" fontWeight="medium">
+                      Stop
                     </Text>
                   </Button>
                 </Container>

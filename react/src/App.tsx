@@ -9,8 +9,10 @@
  * App.tsx - Main CloudXR React Application
  *
  * Modified for BlendedXR:
- * - Move/Scale tool modes
+ * - Move/Scale/Rotate tool modes
  * - Reset Stage button
+ * - Play / Pause timeline button
+ * - Stop timeline button
  * - Right controller trigger grab detection
  * - Sends controller pose messages to Kit over CloudXR MessageChannel
  */
@@ -54,7 +56,7 @@ const poseToRenderText = computed(() =>
   streamingMetrics.value ? `${streamingMetrics.value.latencyMs.toFixed(1)}ms` : '-'
 );
 
-type ToolMode = 'view' | 'moveStage' | 'scaleStage';
+type ToolMode = 'view' | 'moveStage' | 'scaleStage' | 'rotateStage';
 
 type ControllerPosePayload = {
   position: [number, number, number];
@@ -558,12 +560,30 @@ function App() {
     await setMode('scaleStage');
   };
 
+  const handleRotateMode = async () => {
+    await setMode('rotateStage');
+  };
+
   const handleResetStage = async () => {
     toolModeRef.current = 'view';
     setToolMode('view');
 
     await sendMessage({
       type: 'bxr.resetStageTransform',
+      payload: {},
+    });
+  };
+
+  const handleToggleTimeline = async () => {
+    await sendMessage({
+      type: 'bxr.toggleTimeline',
+      payload: {},
+    });
+  };
+
+  const handleStopTimeline = async () => {
+    await sendMessage({
+      type: 'bxr.stopTimeline',
       payload: {},
     });
   };
@@ -730,7 +750,10 @@ function App() {
               <CloudXR3DUI
                 onMoveMode={handleMoveMode}
                 onScaleMode={handleScaleMode}
+                onRotateMode={handleRotateMode}
                 onResetStage={handleResetStage}
+                onToggleTimeline={handleToggleTimeline}
+                onStopTimeline={handleStopTimeline}
                 onDisconnect={handleDisconnect}
                 toolMode={toolMode}
                 serverAddress={serverAddress || config.serverIP}
