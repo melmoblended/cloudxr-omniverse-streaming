@@ -1,0 +1,54 @@
+{
+  "name": "cloudxr-react-example",
+  "version": "6.2.0",
+  "private": true,
+  "description": "React Three Fiber WebXR example for CloudXR",
+  "author": "NVIDIA Corporation",
+  "license": "Apache-2.0",
+  "keywords": [
+    "react",
+    "three.js",
+    "webxr",
+    "cloudxr",
+    "vr"
+  ],
+  "scripts": {
+    "build": "webpack --config ./webpack.prod.js",
+    "dev": "webpack --config ./webpack.dev.js",
+    "dev-server": "webpack serve --config ./webpack.dev.js --no-open",
+    "dev-server:https": "cross-env HTTPS=true webpack serve --config ./webpack.dev.js --no-open",
+    "clean": "rimraf build dist"
+  },
+  "dependencies": {
+    "@nvidia/cloudxr": "file:../simple/nvidia-cloudxr-6.2.0.tgz",
+    "@preact/signals-react": "^3.10.0",
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.6.0",
+    "@react-three/handle": "^6.6.29",
+    "@react-three/uikit": "^1.0.64",
+    "@react-three/uikit-default": "^1.0.64",
+    "@react-three/xr": "^6.6.29",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "three": "^0.184.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@types/three": "^0.184.0",
+    "@webxr-input-profiles/assets": "1.0.20",
+    "copy-webpack-plugin": "^13.0.0",
+    "cross-env": "^10.1.0",
+    "css-loader": "^6.8.1",
+    "gl-matrix": "^3.4.4",
+    "html-webpack-plugin": "^5.6.7",
+    "iwer": "^2.2.1",
+    "long": "^5.3.2",
+    "rimraf": "^5.0.5",
+    "style-loader": "^3.3.3",
+    "ts-loader": "^9.5.7",
+    "typescript": "^5.8.2",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.3"
+  }
+}
